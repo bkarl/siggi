@@ -8,6 +8,7 @@ from blit_manager import BlitManager
 from scipy.fft import fft, fftfreq
 from scipy import signal
 from sample_selector import SampleSelector
+from siggi.structs.file_parameters import FileParameters
 from spectrum_calculator import SpectrumCalculator
 from spectrum_updater import SpectrumUpdater
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -44,9 +45,11 @@ fftwidth_sec = FFT_SIZE/FS
 rect = Rectangle((0, y_size[0]), fftwidth_sec, y_size[1], animated=True, linestyle='-', alpha=0.3, linewidth=1)
 ax_samples.add_patch(rect)
 
+param = FileParameters.create(FS, '', samples.size, FFT_SIZE)
+
 su = SpectrumUpdater(fig_spec.canvas, spec_line)
-sc = SpectrumCalculator(samples, su)
-sss = SampleSelector(fig_samples.canvas, sample_selector=rect, spectrum_calculator=sc, n_samples=samples.size, fs=FS, fft_size=FFT_SIZE)
+sc = SpectrumCalculator(samples, su, param)
+sss = SampleSelector(fig_samples.canvas, sample_selector=rect, spectrum_calculator=sc, file_params=param)
 
 plt.show()
 

@@ -3,6 +3,7 @@ from unittest.mock import MagicMock,patch
 import numpy as np
 import pytest
 from siggi.sample_selector import SampleSelector, UPDATE_TIME_S
+from siggi.structs.file_parameters import FileParameters
 
 
 @pytest.fixture(scope='function')
@@ -13,7 +14,8 @@ def setup(request):
     selector.get_y.return_value = 0x55
     canvas.figure = 5
     calculator = MagicMock()
-    request.cls.sample_selector = SampleSelector(canvas, selector, calculator, n_samples=8192, fs=10e3, fft_size=1024)
+    param = FileParameters.create(fs=10e3, path='', n_samples=8192, fft_size=1024)
+    request.cls.sample_selector = SampleSelector(canvas, selector, calculator, param)
     request.cls.sample_selector.update = MagicMock()
     request.cls.calculator = calculator
     request.cls.selector = selector

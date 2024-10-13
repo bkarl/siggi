@@ -2,12 +2,15 @@ from unittest.mock import MagicMock,patch
 import numpy as np
 import pytest
 from siggi.spectrum_calculator import SpectrumCalculator
+from siggi.structs.file_parameters import FileParameters
+
 
 @pytest.fixture(scope='function')
 def setup(request):
     updater = MagicMock()
     raw_samples = np.arange(4096)
-    request.cls.spectrum_calculator = SpectrumCalculator(raw_samples, updater)
+    param = FileParameters.create(fs=10e3, path='', n_samples=raw_samples.size, fft_size=1024)
+    request.cls.spectrum_calculator = SpectrumCalculator(raw_samples, updater, param)
     request.cls.updater = updater
     yield
 
