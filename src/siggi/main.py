@@ -18,18 +18,8 @@ NUM_POINTS = 16384
 FFT_SIZE = 1024
 FS = 10e3
 dt = 1/FS
-t = np.arange(0.0, NUM_POINTS * dt, dt)
-s1 = np.sin(2 * np.pi * 100 * t)
-s2 = 2 * np.sin(2 * np.pi * 4000 * t)
 
-# create a transient "chirp"
-s2[t <= 1.0] = s2[1.2 <= t] = 0
-
-# add some noise into the mix
-nse = 0.01 * np.random.random(size=len(t))
-# make a new figure
-
-samples = s1 + s2 + nse  # the signal
+samples = np.load('src/siggi/testdata/sine_and_burst_double_10e3hz.npy')
 fig_spec, ax_spec = plt.subplots()
 
 fig_samples, ax_samples = plt.subplots()

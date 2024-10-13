@@ -23,8 +23,6 @@ class SpectrumCalculator():
         if new_center > self.raw_samples.size- self.file_params.fft_size//2:
             new_center = self.raw_samples.size- self.file_params.fft_size//2
 
-        print(new_center)
-
         self.selected_samples = self.raw_samples[new_center - self.file_params.fft_size//2:new_center + self.file_params.fft_size//2]
 
     def notifyUpdate(self, new_center):
