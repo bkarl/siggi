@@ -1,29 +1,40 @@
+import attr
 import numpy as np
+from numpy.fft.helper import fftshift
 from scipy.fft import fft, fftfreq
 
-class SpectrumCalculator():
-    def __init__(self, raw_samples, spectrum_updater, file_params):
-        self.spectrum_updater = spectrum_updater
-        self.raw_samples = raw_samples
-        self.file_params = file_params
-        self.xf, self.yf = np.array([]), np.array([])
-        self.calc_initial_sample_selection()
-        self.calc_frequency_axes()
+from siggi.file_handling.file_reader import FileReader
+from siggi.spectrum_updater import SpectrumUpdater
+from siggi.structs.file_parameters import FileParameters, DataType
 
-    def calc_initial_sample_selection(self):
-        self.selected_samples = self.raw_samples[:self.file_params.fft_size]
 
-    def calc_frequency_axes(self):
-        self.xf = fftfreq(self.file_params.fft_size, self.file_params.sample_period)[:self.file_params.fft_size // 2]
+@attr.s
+class SpectrumCalculator:
+    file_params = attr.ib(type=FileParameters)
+    spectrum_updater = attr.ib(type=SpectrumUpdater)
+    file_reader = attr.ib(type=FileReader)
+    xf = attr.ib(default=np.array([]))
+    yf = attr.ib(default=np.array([]))
+
+    @classmethod
+    def create(cls, file_params, spectrum_updater, file_reader):
+        xf = SpectrumCalculator.calc_frequency_axes(file_params)
+        return cls(file_params, spectrum_updater, file_reader, xf)
+
+    @staticmethod
+    def calc_frequency_axes(params: FileParameters):
+        if params.data_type == DataType.COMPLEX:
+            return fftshift(fftfreq(params.fft_size, params.sample_period))
+        return fftfreq(params.fft_size, params.sample_period)[:params.fft_size // 2]
 
     def calc_new_samples_selection(self, new_center):
         if new_center < self.file_params.fft_size//2:
             new_center = self.file_params.fft_size//2
 
-        if new_center > self.raw_samples.size- self.file_params.fft_size//2:
-            new_center = self.raw_samples.size- self.file_params.fft_size//2
+        if new_center > self.file_params.n_samples - self.file_params.fft_size//2:
+            new_center = self.file_params.n_samples - self.file_params.fft_size//2
 
-        self.selected_samples = self.raw_samples[new_center - self.file_params.fft_size//2:new_center + self.file_params.fft_size//2]
+        self.selected_samples = self.file_reader.file_contents[new_center - self.file_params.fft_size//2:new_center + self.file_params.fft_size//2]
 
     def notifyUpdate(self, new_center):
         self.calc_new_samples_selection(new_center)
@@ -31,4 +42,8 @@ class SpectrumCalculator():
         self.spectrum_updater.update_spectrum((self.xf, self.yf))
 
     def calc_new_spectrum(self):
-        self.yf = 2.0/self.file_params.fft_size * np.abs(fft(self.selected_samples)[:self.file_params.fft_size // 2])
+        self.yf = 2.0 / self.file_params.fft_size * np.abs(fft(self.selected_samples))
+        if self.file_params.data_type == DataType.COMPLEX:
+            self.yf = fftshift(self.yf)
+        else:
+            self.yf = self.yf[:self.file_params.fft_size // 2]

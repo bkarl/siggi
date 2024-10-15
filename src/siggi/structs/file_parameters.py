@@ -1,6 +1,12 @@
+from enum import IntEnum
+
 import attr
 
 DEFAULT_FFT_SIZE = 1024
+
+class DataType(IntEnum):
+    COMPLEX = 0
+    REAL = 1
 
 @attr.s
 class FileParameters:
@@ -9,6 +15,7 @@ class FileParameters:
     path = attr.ib(type=str)
     n_samples = attr.ib(type=int)
     fft_size = attr.ib(type=int, default=DEFAULT_FFT_SIZE)
+    data_type = attr.ib(type=DataType, default=DataType.REAL)
 
     @classmethod
     def create(cls, fs, path, n_samples, fft_size=DEFAULT_FFT_SIZE):
