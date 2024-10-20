@@ -25,7 +25,6 @@ import attr
 NUM_POINTS = 16384
 FFT_SIZE = 1024
 FS = 10e3
-samples = np.load('src/siggi/testdata/sine_and_burst_double_10e3hz.npy')
 
 @attr.s
 class Siggi:
@@ -48,7 +47,7 @@ class Siggi:
 
     def create_waterfall_window(self):
         fig_samples, ax_samples = plt.subplots()
-        ax_samples.specgram(samples, NFFT=self.params.fft_size, Fs=self.params.samplerate_hz)
+        ax_samples.specgram(self.file_reader.file_contents, NFFT=self.params.fft_size, Fs=self.params.samplerate_hz)
         y_size = ax_samples.get_ylim()
         # add a line
         fftwidth_sec = self.params.fft_size / self.params.samplerate_hz
@@ -58,7 +57,7 @@ class Siggi:
 
     def create_spectrum_window(self):
         fig_spec, ax_spec = plt.subplots()
-        yf = fft(samples[:self.params.fft_size])
+        yf = fft(self.file_reader.file_contents[:self.params.fft_size])
         xf = fftfreq(self.params.fft_size, self.params.sample_period)
         if self.params.data_type == DataType.COMPLEX:
             xf = fftshift(xf)
