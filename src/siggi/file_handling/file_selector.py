@@ -14,9 +14,9 @@ class DataImportForm:
         self.root.geometry("400x300")
 
         # Variables to hold form data
-        self.file_entry_var = tk.StringVar()
+        self.file_entry_var = tk.StringVar(value="src/siggi/testdata/testdata_large_complex_10e3hz.npy")
         self.samplerate_var = tk.StringVar(value="10e3")
-        self.data_format_var = tk.StringVar()
+        self.data_format_var = tk.StringVar(value="Complex")
 
         # Build the form
         self.create_widgets()

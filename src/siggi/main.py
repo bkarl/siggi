@@ -66,6 +66,7 @@ class Siggi:
             xf = xf[:self.params.fft_size // 2]
             yf = yf[:self.params.fft_size // 2]
         spec_line, = ax_spec.plot(xf, 2.0 / self.params.fft_size * np.abs(yf), animated=True)
+        #ax_spec.set_ylim(0, 1e6)
         return fig_spec, spec_line
 
 
