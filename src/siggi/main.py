@@ -14,6 +14,7 @@ from scipy.fft import fft, fftfreq
 from scipy import signal
 from sample_selector import SampleSelector
 from siggi.file_handling.file_reader import FileReader
+from siggi.file_handling.file_reader_factory import FileReaderFactory
 from siggi.file_handling.file_selector import DataImportForm
 from siggi.structs.file_parameters import FileParameters, DataType
 from spectrum_calculator import SpectrumCalculator
@@ -33,7 +34,7 @@ class Siggi:
 
     @classmethod
     def create(cls, file_params):
-        file_reader = FileReader(file_params)
+        file_reader = FileReaderFactory.get_correct_fileread(file_params)
         file_reader.loadFile()
         return cls(file_params, file_reader)
 
@@ -49,6 +50,15 @@ class Siggi:
         fig_samples, ax_samples = plt.subplots()
         ax_samples.specgram(self.file_reader.file_contents, NFFT=self.params.fft_size, Fs=self.params.samplerate_hz)
         y_size = ax_samples.get_ylim()
+        # Get the current x-tick values
+        current_ticks = ax_samples.get_xticks()
+
+        # Double the tick values
+        new_ticks = current_ticks * self.params.shrinked_size_to_real_size_ratio
+
+        # Set the new tick values on the x-axis
+        ax_samples.set_xticklabels([f"{tick:.2f}" for tick in new_ticks])  # Update the tick labels
+
         # add a line
         fftwidth_sec = self.params.fft_size / self.params.samplerate_hz
         rect = Rectangle((0, y_size[0]), fftwidth_sec, y_size[1], animated=True, linestyle='-', alpha=0.3, linewidth=1)

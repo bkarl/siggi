@@ -16,6 +16,7 @@ class FileParameters:
     n_samples = attr.ib(type=int)
     fft_size = attr.ib(type=int, default=DEFAULT_FFT_SIZE)
     data_type = attr.ib(type=DataType, default=DataType.REAL)
+    shrinked_size_to_real_size_ratio = attr.ib(type=float, default=1.0)
 
     @classmethod
     def create(cls, fs, path, n_samples, fft_size=DEFAULT_FFT_SIZE):
