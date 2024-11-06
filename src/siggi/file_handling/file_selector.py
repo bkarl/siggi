@@ -36,8 +36,8 @@ class DataImportForm:
         # Sample rate selection section
         samplerate_label = ttk.Label(self.root, text="Sample Rate (Hz):")
         samplerate_label.pack(pady=5)
-        samplerate_entry = ttk.Entry(self.root, textvariable=self.samplerate_var)
-        samplerate_entry.pack(pady=5)
+        self.samplerate_entry = ttk.Entry(self.root, textvariable=self.samplerate_var)
+        self.samplerate_entry.pack(pady=5)
 
         # Data format selection section
         data_format_label = ttk.Label(self.root, text="Data Format:")
@@ -61,6 +61,7 @@ class DataImportForm:
             elif file_path.lower().endswith('.wvd'):
                 self.data_format_var.set('Complex')
                 self.data_format_combobox.config(state='disabled')
+                self.samplerate_entry.config(state='disabled')
             else:
                 self.data_format_var.set('')
                 self.data_format_combobox.config(state='normal')

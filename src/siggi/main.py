@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import numpy as np
 import matplotlib
@@ -25,6 +26,7 @@ import attr
 
 NUM_POINTS = 16384
 FS = 10e3
+logging.getLogger().setLevel(logging.INFO)
 
 @attr.s
 class Siggi:
@@ -76,6 +78,7 @@ class Siggi:
             yf = yf[:self.params.fft_size // 2]
         yf = 2.0 / self.params.fft_size * np.abs(yf)
         spec_line, = ax_spec.plot(xf, 20 * np.log10(yf/self.params.fft_ref), animated=True)
+        ax_spec.grid(True, which='major', axis='both', linestyle=':')
         #ax_spec.set_ylim(0, 1e6)
         return fig_spec, spec_line
 
