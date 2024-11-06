@@ -1,3 +1,4 @@
+import logging
 from abc import abstractmethod
 
 import attr
@@ -21,6 +22,10 @@ class FileReader:
             self.load_small_file()
         self.file_params.n_samples = self.file_contents.size
         self.check_datatype()
+        self._choose_fft_size()
+
+    def _choose_fft_size(self):
+        self.file_params.fft_size = FileParameters.choose_fft_size(self.file_params.samplerate_hz, self.file_contents.size)
 
     def check_datatype(self):
         if 'complex' in self.file_contents.dtype.name:
@@ -33,7 +38,7 @@ class FileReader:
     def load_large_file(self):
         max_size_bytes = MAX_MEMORY_SIZE_MB * 1024 * 1024  # Convert MB to bytes
         block_size = self.file_params.fft_size
-        # Get the array shape and data type from the .npy file header
+        # Get the array shape and data type from the file header
         n_elements, element_size_byte, dtype = self.get_file_meta()
 
         # Calculate the maximum number of elements that can fit in the resulting array
@@ -52,9 +57,17 @@ class FileReader:
         data = self.map_large_file()
         # Read blocks of 1024 elements and store in the result array
         for i, idx in enumerate(block_indices):
-            self.file_contents[i] = data[idx:idx + block_size]
+            logging.info(f"Loading block {i}/{block_indices.size}")
+            actual_idx = idx
+            if dtype == np.int16:
+                actual_idx = idx * 2
+            self.file_contents[i] = data[actual_idx:actual_idx + block_size]
         self.file_contents = self.file_contents.flatten()
         self.file_params.shrinked_size_to_real_size_ratio = n_elements / max_elements
+        self.convert_file_contents()
+
+    def convert_file_contents(self):
+        pass
 
     @abstractmethod
     def map_large_file(self):

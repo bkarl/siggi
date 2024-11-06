@@ -42,7 +42,8 @@ class SpectrumCalculator:
         self.spectrum_updater.update_spectrum((self.xf, self.yf))
 
     def calc_new_spectrum(self):
-        self.yf = 2.0 / self.file_params.fft_size * np.abs(fft(self.selected_samples))
+        self.yf = 2.0 / self.file_params.fft_size * np.abs(fft(self.selected_samples * np.hanning(self.file_params.fft_size)))
+        self.yf = 20 * np.log10(self.yf/self.file_params.fft_ref)
         if self.file_params.data_type == DataType.COMPLEX:
             self.yf = fftshift(self.yf)
         else:

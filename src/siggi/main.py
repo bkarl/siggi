@@ -24,7 +24,6 @@ from tkinter import *
 import attr
 
 NUM_POINTS = 16384
-FFT_SIZE = 1024
 FS = 10e3
 
 @attr.s
@@ -34,7 +33,7 @@ class Siggi:
 
     @classmethod
     def create(cls, file_params):
-        file_reader = FileReaderFactory.get_correct_fileread(file_params)
+        file_reader = FileReaderFactory.get_correct_file_reader(file_params)
         file_reader.loadFile()
         return cls(file_params, file_reader)
 
@@ -67,7 +66,7 @@ class Siggi:
 
     def create_spectrum_window(self):
         fig_spec, ax_spec = plt.subplots()
-        yf = fft(self.file_reader.file_contents[:self.params.fft_size])
+        yf = fft(self.file_reader.file_contents[:self.params.fft_size] * np.hanning(self.params.fft_size))
         xf = fftfreq(self.params.fft_size, self.params.sample_period)
         if self.params.data_type == DataType.COMPLEX:
             xf = fftshift(xf)
@@ -75,7 +74,8 @@ class Siggi:
         else:
             xf = xf[:self.params.fft_size // 2]
             yf = yf[:self.params.fft_size // 2]
-        spec_line, = ax_spec.plot(xf, 2.0 / self.params.fft_size * np.abs(yf), animated=True)
+        yf = 2.0 / self.params.fft_size * np.abs(yf)
+        spec_line, = ax_spec.plot(xf, 20 * np.log10(yf/self.params.fft_ref), animated=True)
         #ax_spec.set_ylim(0, 1e6)
         return fig_spec, spec_line
 

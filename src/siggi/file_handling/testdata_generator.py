@@ -39,10 +39,18 @@ def gen_cw_and_burst(filename, num_samples):
 
     # add some noise into the mix
     nse = 0.01 * np.random.random(size=len(t))
-    # make a new figure
     samples = bursts + nse + cw
     np.save(TESTDATA_DIR+f'{filename}_real_10e3hz.npy', samples.real)
     np.save(TESTDATA_DIR+f'{filename}_complex_10e3hz.npy', samples)
+    #samples.real /= max(np.abs(np.max(samples.real)), np.abs(np.min(samples.real)))
+    #samples.imag /= max(np.abs(np.max(samples.imag)), np.abs(np.min(samples.imag)))
+    samples.real = samples.real * 2**12
+    samples.imag = samples.imag * 2**12
+
+    interleaved = np.column_stack((samples.real.astype(np.int16), samples.imag.astype(np.int16))).flatten()
+    interleaved.tofile(TESTDATA_DIR+f'{filename}_complex_10e3hz.wvd')
+    with open(TESTDATA_DIR+f'{filename}_complex_10e3hz.wvh', 'w') as filetowrite:
+        filetowrite.write(f"{{TYPE:RAW16LE}}{{RESOLUTION:16}}{{COMPONENTS:IQ}}{{CLOCK:10000.0}}{{SAMPLES:{samples.size}}}")
 
 
 if __name__ == '__main__':
@@ -50,4 +58,4 @@ if __name__ == '__main__':
     large_file_size_byte = 1e9
     n_samples_large_files = int(large_file_size_byte)//16
     gen_cw_and_burst("testdata_small", num_samples=16384)
-    gen_cw_and_burst("testdata_large", num_samples=n_samples_large_files)
+    #gen_cw_and_burst("testdata_large", num_samples=n_samples_large_files)

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 
-from siggi.structs.file_parameters import FileParameters
+from siggi.structs.file_parameters import FileParameters, DataType
 
 
 class DataImportForm:
@@ -58,6 +58,9 @@ class DataImportForm:
             if file_path.lower().endswith('.npy'):
                 self.data_format_var.set('N/A')
                 self.data_format_combobox.config(state='disabled')
+            elif file_path.lower().endswith('.wvd'):
+                self.data_format_var.set('Complex')
+                self.data_format_combobox.config(state='disabled')
             else:
                 self.data_format_var.set('')
                 self.data_format_combobox.config(state='normal')
@@ -84,5 +87,8 @@ class DataImportForm:
         self.root.destroy()
 
     def get_file_parameters(self):
+        dtype = DataType.COMPLEX
+        if "Real" in self.data_format_var.get():
+            dtype = DataType.REAL
         # Return the selected values as a dictionary
-        return FileParameters.create(fs=float(self.samplerate_var.get()), path=self.file_entry_var.get(), n_samples=0)
+        return FileParameters.create(fs=float(self.samplerate_var.get()), path=self.file_entry_var.get(), n_samples=0, data_type=dtype)

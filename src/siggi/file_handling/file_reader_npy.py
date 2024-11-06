@@ -8,9 +8,9 @@ from siggi.structs.file_parameters import FileParameters, DataType
 MAX_FILE_SIZE = 100e6
 MAX_MEMORY_SIZE_MB = 512
 
+
 @attr.s
 class FileReaderNpy(FileReader):
-
     def load_small_file(self):
         self.file_contents = np.load(self.file_params.path)
 
