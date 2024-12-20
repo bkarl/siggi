@@ -1,7 +1,6 @@
 import attr
 import numpy as np
-from numpy.fft.helper import fftshift
-from scipy.fft import fft, fftfreq
+from scipy.fft import fft, fftfreq, fftshift
 
 from siggi.file_handling.file_reader import FileReader
 from siggi.spectrum_updater import SpectrumUpdater

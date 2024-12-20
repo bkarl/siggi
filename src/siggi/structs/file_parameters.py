@@ -27,7 +27,7 @@ class FileParameters:
 
     @staticmethod
     def choose_fft_size(fs_in, n_samples):
-        window = fs_in // 20
+        window = fs_in // 10
         fft_size = min(MAX_FFT_SIZE, 2**(int(round(np.log2(window))) + 1))
         fft_size = min(fft_size, n_samples)
         logging.info(f'Setting fft size to {fft_size}.')
